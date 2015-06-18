@@ -1,0 +1,34 @@
+{
+  "name": "kamu",
+  "version": "1.0.0",
+  "description": "story part image proxy",
+  "main": "index.js",
+  "scripts": {
+    "test": "gulp test",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Wattpad/image-proxy.git"
+  },
+  "keywords": [
+    "story",
+    "part",
+    "image",
+    "proxy"
+  ],
+  "bugs": {
+    "url": "https://github.com/Wattpad/image-proxy/issues"
+  },
+  "homepage": "https://github.com/Wattpad/image-proxy#readme",
+  "devDependencies": {
+    "chai": "^3.0.0",
+    "chai-as-promised": "^5.1.0",
+    "gulp-mocha": "^2.1.1",
+    "gulp-plumber": "^1.0.1",
+    "rewire": "^2.3.4",
+    "sinon": "^1.15.3",
+    "sinon-chai": "^2.8.0",
+    "yargs": "^3.11.0"
+  }
+}

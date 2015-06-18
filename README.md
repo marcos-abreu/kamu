@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/marcos-abreu/kamu.svg?branch=master)](https://travis-ci.org/marcos-abreu/kamu)
+
 # Kamu - Asset Proxy
 
 Kamu is a media asset proxy, that can be used as an *SSL* image proxy, or ad script proxy, or any type of asset proxy your project might need;

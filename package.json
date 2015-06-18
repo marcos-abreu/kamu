@@ -1,7 +1,7 @@
 {
   "name": "kamu",
   "version": "1.0.0",
-  "description": "story part image proxy",
+  "description": "media asset proxy",
   "main": "index.js",
   "scripts": {
     "test": "gulp test",
@@ -12,9 +12,10 @@
     "url": "git+https://github.com/marcos-abreu/kamu.git"
   },
   "keywords": [
-    "story",
-    "part",
+    "media",
     "image",
+    "video",
+    "ssl"
     "proxy"
   ],
   "bugs": {

@@ -15,7 +15,7 @@
     "media",
     "image",
     "video",
-    "ssl"
+    "ssl",
     "proxy"
   ],
   "bugs": {

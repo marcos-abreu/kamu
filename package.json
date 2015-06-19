@@ -1,7 +1,7 @@
 {
   "name": "kamu",
   "version": "1.0.0",
-  "description": "media asset proxy",
+  "description": "SSL Asset Proxy",
   "main": "index.js",
   "scripts": {
     "test": "gulp test",
@@ -16,6 +16,7 @@
     "image",
     "video",
     "ssl",
+    "asset",
     "proxy"
   ],
   "bugs": {

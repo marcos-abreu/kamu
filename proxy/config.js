@@ -22,7 +22,7 @@ exports.host            = process.env.KAMU_HOST || 'https://www.media-proxy.com'
 // server port
 exports.port            = parseInt( process.env.KAMU_PORT || 8081, 10 );
 // this agent will be sent with the external request ad the 'via' request header
-exports.proxyAgent      = process.env.KAMU_HEADER_VIA || ( 'kamu.asset.proxy-' + meta.version );
+exports.proxyAgent      = process.env.KAMU_AGENT || ( 'kamu.asset.proxy-' + meta.version );
 
 
 // maximum number of redirects to follow for a media asset request

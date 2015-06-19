@@ -72,7 +72,7 @@ If you find yourself improving the code and you think others would benefit from 
 
 But before opening a pull request make sure you create/modify the unit tests to make sure your changes haven't broken the current behavior.
 
-The unit tests uses *[mocha]()*, *[sinon]()*, *[chai]()*, and [rewire]()* - these are common modules used when writing javascript (nodejs) unit tests.
+The unit tests uses *[mocha](https://github.com/mochajs/mocha)*, *[sinon](http://sinonjs.org/)*, *[chai](https://github.com/domenic/sinon-chai)*, and *[rewire](https://github.com/jhnns/rewire)* - these are common modules used when writing nodejs unit tests.
 
 To run the current set of specs:
 

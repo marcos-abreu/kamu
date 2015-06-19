@@ -26,18 +26,18 @@ exports.proxyAgent      = process.env.KAMU_AGENT || ( 'kamu.asset.proxy-' + meta
 
 
 // maximum number of redirects to follow for a media asset request
-exports.maxRedirects    = process.env.KAMU_MAX_REDIRECTS || 4;
+exports.maxRedirects    = process.env.KAMU_REDIRECTS || 4;
 // maximum waiting time for a media asset response (in seconds)
-exports.socketTimeout   = process.env.KAMU_SOCKET_TIMEOUT || 10;
+exports.socketTimeout   = process.env.KAMU_TIMEOUT || 10;
 // true - will keep the connection open | false will close the connection for every request
 exports.keepAlive       = process.env.KAMU_KEEP_ALIVE || false;
 
 
 // list of domains that are allowed to get timings requests - cross-domain timings
 // set to false to block timings from all external domains
-exports.timingOrigin    = process.env.KAMU_TIMING_ALLOW_ORIGIN || false;
+exports.timingOrigin    = process.env.KAMU_TIMINGS || false;
 // media asset length limit in bytes - defaults to 5Mb
-exports.lengthLimit     = parseInt( ( process.env.KAMU_LENGTH_LIMIT || 5242880 ), 10 );
+exports.lengthLimit     = parseInt( ( process.env.KAMU_LENGTH || 5242880 ), 10 );
 // valid content types
 exports.validTypes      = require( path.resolve( __dirname, '../', 'mime-types.json' ) );
 

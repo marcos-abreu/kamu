@@ -22,11 +22,11 @@ Bellow is a full list of environment variables you can set to configure the beha
 | `KAMU_HOST`                | fully qualified hostname of your server. **must set to the appropriate value** |
 | `KAMU_PORT`                | host port. (default to: `8081`) |
 | `KAMU_AGENT`               | agent string to be sent when requesting external assets as the `via` request header. (default to: `kamu.asset.proxy-{#app-version}`) |
-| `KAMU_LENGTH_LIMIT`        | asset size limit in bytes. (defaults to: `5242880`) |
-| `KAMU_MAX_REDIRECTS`       | maximum number of redirects to follow for an external asset request. (default to: `4`) |
-| `KAMU_SOCKET_TIMEOUT`      | maximum waiting time for an external request in seconds. (default to: `10`) |
+| `KAMU_LENGTH`        | asset size limit in bytes. (defaults to: `5242880`) |
+| `KAMU_REDIRECTS`       | maximum number of redirects to follow for an external asset request. (default to: `4`) |
+| `KAMU_TIMEOUT`      | maximum waiting time for an external request in seconds. (default to: `10`) |
 | `KAMU_KEEP_ALIVE`          | flag defining if the connection should be kept open to be reused by multiple requests, or if they should be closed after every request. (defaults to: `false`) |
-| `KAMU_TIMING_ALLOW_ORIGIN` | list of domains that are allowed to collect timings data, set to false to disable the feature - for more info [check here](). (default to: `false`) |
+| `KAMU_TIMINGS` | list of domains that are allowed to collect timings data, set to false to disable the feature - for more info [check here](). (default to: `false`) |
 | `KAMU_LOGGING`             | set the logging permissions for the server. possible options are `debug`, `enabled` and `disabled`. (default to: `disabled`) |
 
 Aside from the environment variables you can define, you can also limit the `content-type` of assets you want to allow, for that use the [mime-types.json](mime-types.json) file available.

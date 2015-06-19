@@ -22,8 +22,20 @@ describe( 'config module', function() {
   } );
 
   describe( 'when environment key is defined', function() {
-    it.skip( 'should expose the environment key', function() {
+    var configCustom;
 
+    before( function() {
+      process.env.KAMU_KEY = 'custom key';
+    } );
+
+    after( function() {
+      process.env.KAMU_KEY = void 0;
+    } );
+
+    it( 'should expose the environment key', function() {
+      // using rewire to avoid getting the cached module
+      configCustom = rewire( '../proxy/config' );
+      expect( configCustom.proxyKey ).to.be.equal( 'custom key' );
     } );
   } );
 
@@ -34,9 +46,22 @@ describe( 'config module', function() {
   } );
 
   describe( 'when environment logging is defined', function() {
-    it.skip( 'should expose the environment logging', function() {
+    var configCustom;
 
+    before( function() {
+      process.env.KAMU_LOGGING = 'enabled';
     } );
+
+    after( function() {
+      process.env.KAMU_LOGGING = void 0;
+    } );
+
+    it( 'should expose the environment logging', function() {
+      // using rewire to avoid getting the cached module
+      configCustom = rewire( '../proxy/config' );
+      expect( configCustom.log ).to.be.equal( 'enabled' );
+    } );
+
   } );
 
   describe( 'when environment logging is NOT defined', function() {
@@ -46,8 +71,20 @@ describe( 'config module', function() {
   } );
 
   describe( 'when environment host is defined', function() {
-    it.skip( 'should expose the environment host', function() {
+    var configCustom;
 
+    before( function() {
+      process.env.KAMU_HOST = 'custom host';
+    } );
+
+    after( function() {
+      process.env.KAMU_HOST = void 0;
+    } );
+
+    it( 'should expose the environment host', function() {
+      // using rewire to avoid getting the cached module
+      configCustom = rewire( '../proxy/config' );
+      expect( configCustom.host ).to.be.equal( 'custom host' );
     } );
   } );
 
@@ -58,8 +95,20 @@ describe( 'config module', function() {
   } );
 
   describe( 'when environment port is defined', function() {
-    it.skip( 'should expose the environment port', function() {
+    var configCustom;
 
+    before( function() {
+      process.env.KAMU_PORT = 9999;
+    } );
+
+    after( function() {
+      process.env.KAMU_PORT = void 0;
+    } );
+
+    it( 'should expose the environment port', function() {
+      // using rewire to avoid getting the cached module
+      configCustom = rewire( '../proxy/config' );
+      expect( configCustom.port ).to.be.equal( 9999 );
     } );
   } );
 
@@ -70,8 +119,20 @@ describe( 'config module', function() {
   } );
 
   describe( 'when environment proxy agent is defined', function() {
-    it.skip( 'should expose the environment proxy agent', function() {
+    var configCustom;
 
+    before( function() {
+      process.env.KAMU_AGENT = 'custom agent';
+    } );
+
+    after( function() {
+      process.env.KAMU_AGENT = void 0;
+    } );
+
+    it( 'should expose the environment proxy agent', function() {
+      // using rewire to avoid getting the cached module
+      configCustom = rewire( '../proxy/config' );
+      expect( configCustom.proxyAgent ).to.be.equal( 'custom agent' );
     } );
   } );
 
@@ -82,8 +143,20 @@ describe( 'config module', function() {
   } );
 
   describe( 'when environment maximum redirects is defined', function() {
-    it.skip( 'should expose the environment maximum redirects', function() {
+    var configCustom;
 
+    before( function() {
+      process.env.KAMU_REDIRECTS = 999;
+    } );
+
+    after( function() {
+      process.env.KAMU_REDIRECTS = void 0;
+    } );
+
+    it( 'should expose the environment maximum redirects', function() {
+      // using rewire to avoid getting the cached module
+      configCustom = rewire( '../proxy/config' );
+      expect( configCustom.maxRedirects ).to.be.equal( 999 );
     } );
   } );
 
@@ -94,8 +167,20 @@ describe( 'config module', function() {
   } );
 
   describe( 'when environment maximum waiting time is defined', function() {
-    it.skip( 'should expose the environment maximum waiting time', function() {
+    var configCustom;
 
+    before( function() {
+      process.env.KAMU_TIMEOUT = 999;
+    } );
+
+    after( function() {
+      process.env.KAMU_TIMEOUT = void 0;
+    } );
+
+    it( 'should expose the environment maximum waiting time', function() {
+      // using rewire to avoid getting the cached module
+      configCustom = rewire( '../proxy/config' );
+      expect( configCustom.socketTimeout ).to.be.equal( 999 );
     } );
   } );
 
@@ -106,8 +191,20 @@ describe( 'config module', function() {
   } );
 
   describe( 'when environment keep alive is defined', function() {
-    it.skip( 'should expose the environment keep alive', function() {
+    var configCustom;
 
+    before( function() {
+      process.env.KAMU_KEEP_ALIVE = true;
+    } );
+
+    after( function() {
+      process.env.KAMU_KEEP_ALIVE = void 0;
+    } );
+
+    it( 'should expose the environment keep alive', function() {
+      // using rewire to avoid getting the cached module
+      configCustom = rewire( '../proxy/config' );
+      expect( configCustom.keepAlive ).to.be.equal( true );
     } );
   } );
 
@@ -118,8 +215,20 @@ describe( 'config module', function() {
   } );
 
   describe( 'when environment timing origin is defined', function() {
-    it.skip( 'should expose the environment timing origin', function() {
+    var configCustom;
 
+    before( function() {
+      process.env.KAMU_TIMINGS = 'custom timings';
+    } );
+
+    after( function() {
+      process.env.KAMU_TIMINGS = void 0;
+    } );
+
+    it( 'should expose the environment timing origin', function() {
+      // using rewire to avoid getting the cached module
+      configCustom = rewire( '../proxy/config' );
+      expect( configCustom.timingOrigin ).to.be.equal( 'custom timings' );
     } );
   } );
 
@@ -130,8 +239,20 @@ describe( 'config module', function() {
   } );
 
   describe( 'when environment length limit is defined', function() {
-    it.skip( 'should expose the environment length limit', function() {
+    var configCustom;
 
+    before( function() {
+      process.env.KAMU_LENGTH = 999999999;
+    } );
+
+    after( function() {
+      process.env.KAMU_LENGTH = void 0;
+    } );
+
+    it( 'should expose the environment length limit', function() {
+      // using rewire to avoid getting the cached module
+      configCustom = rewire( '../proxy/config' );
+      expect( configCustom.lengthLimit ).to.be.equal( 999999999 );
     } );
   } );
 
@@ -144,6 +265,7 @@ describe( 'config module', function() {
   it( 'should expose valid asset types based on the mime-types.json', function() {
     var types = require( path.resolve( __dirname, '../../', 'mime-types.json' ) );
     expect( config.validTypes ).to.be.deep.equal( types );
+    expect( config.validTypes ).to.be.an.array;
   } );
 
   it( 'should expose the default safe headers', function() {

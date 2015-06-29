@@ -289,7 +289,7 @@ module.exports.processRequest = function( req, res ) {
     'Via': config.proxyAgent,
     'User-Agent': ( req.headers[ 'user-agent' ] != null ? req.headers[ 'user-agent' ] : 'unknown' ),
     'Accept': ( req.headers.accept != null ? req.headers.accept : 'image/*' ),
-    'Accept-Encoding': req.headers[ 'accept-encoding' ],
+    'Accept-Encoding': ( req.headers[ 'accept-encoding' ] != null ? req.headers[ 'accept-encoding' ] : 'unknown' ),
     'X-Frame-Options': config.defaultHeaders[ 'X-Frame-Options' ],
     'X-XSS-Protection': config.defaultHeaders[ 'X-XSS-Protection' ],
     'X-Content-Type-Options': config.defaultHeaders[ 'X-Content-Type-Options' ],

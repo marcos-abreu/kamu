@@ -7,8 +7,8 @@ var path          = require( 'path' ),
     argv          = require( 'yargs' ).argv,
     proxyUrl      = require( './demo/utils' ).proxyUrl;
 
-gulp.task( 'test', function() {
-  return gulp.src( path.resolve( __dirname, 'test/**/*.spec.js' ), { read: false } )
+gulp.task( 'test:unit', function() {
+  return gulp.src( path.resolve( __dirname, 'test/specs/**/*.spec.js' ), { read: false } )
     .pipe( mocha( {
       reporter: 'dot',
       clearRequireCache: true,
@@ -16,6 +16,16 @@ gulp.task( 'test', function() {
     } ) );
 } );
 
+gulp.task( 'test:integration', function() {
+  return gulp.src( path.resolve( __dirname, 'test/integration/**/*.js' ), { read: false } )
+    .pipe( mocha( {
+      reporter: 'dot',
+      clearRequireCache: true,
+      ignoreLeaks: true
+    } ) );
+} );
+
+gulp.task( 'test', [ 'test:unit', 'test:integration' ] );
 
 gulp.task( 'proxy', function() {
   var url = argv.url;

@@ -41,3 +41,5 @@ console.log( config.name + ' ssl image proxy running on ' + config.port + ' ' +
 
 // start listening for requests
 server.listen( config.port );
+
+module.exports = server;

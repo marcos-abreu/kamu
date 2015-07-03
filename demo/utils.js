@@ -5,6 +5,12 @@
 var Crypto = require('crypto');
 var config = require( '../proxy/config' );
 
+/*
+ * returns a proxy url string based on server configuration
+ *
+ * @param 		string 		url 	url object for external url
+ * @returns 	string 				proxy url string
+ */
 exports.proxyUrl = function(url) {
   var hmac,
       hmacDigest,

@@ -29,6 +29,7 @@
     "gulp-mocha": "^2.1.1",
     "gulp-plumber": "^1.0.1",
     "rewire": "^2.3.4",
+    "run-sequence": "^1.1.1",
     "sinon": "^1.15.3",
     "sinon-chai": "^2.8.0",
     "yargs": "^3.11.0"

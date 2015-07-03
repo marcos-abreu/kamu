@@ -54,17 +54,23 @@ Even if you go for *option #1* you should always consider using a CDN as a gatew
 
 ### Generating Kamu Asset URL
 
-Once you have configured your **Kamu** proxy server, you will also need to generate HTML pages with links that makes use of your **Kamu** proxy server.
+Once you have configured your **kamu** proxy server, you will also need to generate HTML pages with links that makes use of your this server.
 
 The logic used to generate the proxy urls can be found in the [demo/utils.js](demo/utils.js) file - the code is well commented so that you can adapt it to your own use.
 
-If you only want to test your newly configured **kamu** proxy server, then you can use a pre-configured gulp task to generate your urls:
+If you want to locally test your newly configured **kamu** proxy server, you can use a pre-configured gulp task to generate valid urls for your server.
 
 ```
-gulp proxy --url=http://www.some-domain.com/path/to/image.png
+gulp proxy --url=http://www.some-domain.com/path/to/image.png [--key=SOME-HEXDEC-KEY] [--host=https://myhost.com]
 ```
 
-where `http://www.some-domain.com/path/to/image.png` should be replaced with a valid external asset url, that you want to serve through your **Kamu** proxy server.
+| Command Option           | Description |
+| :----------------------- | :---------- |
+| `--url`                  | external media url you want to proxy through your **Kamu** server |
+| `--key`                  | `KAMU_KEY` value set as an enviroument variable in your server |
+| `--host`                 | `KAMU_HOST` value set as an envirounment variable in your server |
+
+the `--key` and `--host` are optinal parameters, and if not informed it will use the defaults provided in the [proxy/config.js](proxy/config.js) file. If your server set those enviroument variables (and they should) you must provide these options in order to generate valid urls.
 
 ### Contributing to Kamu
 

@@ -42,6 +42,27 @@ exports.lengthLimit     = parseInt( ( process.env.KAMU_LENGTH || 5242880 ), 10 )
 exports.validTypes      = require( path.resolve( __dirname, '../', 'mime-types.json' ) );
 
 
+// valid transformation media content types
+exports.transformTypes = [
+  "image/jp2",
+  "image/jpeg",
+  "image/jpg",
+  "image/png",
+  "image/tiff"
+];
+// do not enlarge the image if its dimentions are less than what is required
+exports.transformWithoutEnlargement = true;
+// output format supported
+exports.transformFormats = [ 'jpeg', 'png', 'webp', 'raw' ];
+// pre-defined rotation angles
+exports.transformAngles  = [ '0', '90', '180', '270' ];
+exports.transformGravity = [ 'north', 'east', 'south', 'west', 'center', 'centre' ];
+// s    scale   |   x     extract   |  r    rotate   |  m     mirroring   |  q    quality   |  f    format
+// w    width   |   h     height    |  g    gravity
+// xw   crop w  |   xh    crop h    |  xt   crop top |  xl    crop left
+exports.transformOptions = [ 's', 'x', 'r', 'm', 'q', 'f', 'w', 'h', 'xw', 'xh', 'xt', 'xl', 'g' ];
+
+
 // default safe headers to be used by default on responses
 exports.defaultHeaders  = {
   // do not allow part images to be shown on frames (iframes)

@@ -5,7 +5,9 @@ var Crypto      = require( 'crypto' ),
     Http        = require( 'http' ),
     Https       = require( 'https' ),
     QueryString = require( 'querystring' ),
-    Url         = require( 'url' );
+    Url         = require( 'url' ),
+    sharp       = require( 'sharp' ),
+    _           = require( 'lodash' );
 
 // custom modules
 var config      = require( './config' ),
@@ -25,15 +27,13 @@ var finish = function( res, str ) {
 };
 
 /*
- * respond with a 404 to a request
+ * write the error response headers
  *
- * @param   object    res     http response object
- * @param   string    msg     404 message string
- * @param   object    url     url object
+ * @param     res           object        response object
+ * @param     statusCode    integer       numeric response code to write
  */
-var fourOhFour = function( res, msg, url ) {
-  log.error( msg + ': ' + ( ( url != null ? url.format() : void 0 ) || 'unknown' ) );
-  res.writeHead( 404, {
+var writeErrorHead = function( res, statusCode ) {
+  res.writeHead( statusCode, {
     'expires': '0',
     'Cache-Control': 'no-cache, no-store, private, must-revalidate',
     'X-Frame-Options': config.defaultHeaders[ 'X-Frame-Options' ],
@@ -42,8 +42,140 @@ var fourOhFour = function( res, msg, url ) {
     'Content-Security-Policy': config.defaultHeaders[ 'Content-Security-Policy' ],
     'Strict-Transport-Security': config.defaultHeaders[ 'Strict-Transport-Security' ]
   } );
+};
 
+/*
+ * respond with a 404 response
+ *
+ * @param   object    res     http response object
+ * @param   string    msg     404 message string
+ * @param   object    url     url object
+ */
+var fourOhFour = function( res, msg, url ) {
+  log.error( msg + ': ' + ( ( url != null ? url.format() : void 0 ) || 'unknown' ) );
+  writeErrorHead( res, 404 );
   return finish( res, 'Not Found' );
+};
+
+/*
+ * respond with a 500 response
+ *
+ * @param   object    res     http response object
+ * @param   string    msg     404 message string
+ * @param   object    url     url object
+ * @param   object    err     error object to log
+ */
+var fiveHundred = function( res, msg, url, err ) {
+  log.error( msg + ': ' + ( ( url != null ? url.format() : void 0 ) || 'unknown' ), err );
+  writeErrorHead( res, 500 );
+  return finish( res, 'Internal Error' );
+};
+
+
+/*
+ * Create a duplex transformer stream to handle the necessary media transformations
+ * @param     object    options             processing options
+ */
+var transformMedia = function( options ) {
+  var width = options.w ? parseInt( options.w, 10 ) || null : null,
+      height = options.h ? parseInt( options.h, 10 ) || null : null,
+      xwidth = options.xw ? parseInt( options.xw, 10 ) || null : null,
+      xheight = options.xh ? parseInt( options.xh, 10 ) || null : null,
+      xtop = options.xt ? parseInt( options.xt, 10 ) || 0 : 0,
+      xleft = options.xl ? parseInt( options.xl, 10 ) || 0 : 0,
+      gravity = options.g || null,
+      quality = options.q ? parseInt( options.q ) || config.transformQuality : config.transformQuality,
+      format = options.f || null,
+      resizeDone = false,
+      rotateDone = false,
+      mirrorDone = false,
+      extractDone = false,
+      transformer;
+
+  // images won't enlarge past its original size
+  // todo: I don't know if this is desirable for all operations
+  if ( config.transformWithoutEnlargement ) {
+    transformer = sharp().withoutEnlargement();
+  }
+
+  _.each( options, function( value, operation ) {
+    switch( operation ) {
+      case 's':
+        if ( !resizeDone ) {
+          switch ( value ) {
+            case 'scale':
+              if ( width || height ) {
+                transformer.resize( width, height );
+                if ( width && height ) {
+                  transformer.ignoreAspectRatio();
+                }
+                resizeDone = true;
+              }
+              break;
+            case 'fit':
+              if ( width && height ) {
+                transformer.resize( width, height );
+                transformer.max();
+                resizeDone = true;
+              }
+              break;
+            case 'fill':
+              if ( width && height ) {
+                transformer.resize( width, height );
+                transformer.min();
+                resizeDone = true;
+              }
+              break;
+          }
+        }
+        break;
+      case 'x':
+        if ( !extractDone && value === 'crop' && ( xwidth && xheight ) ) {
+          transformer.extract( xtop, xleft, xwidth, xheight );
+          extractDone = true;
+        }
+        break;
+      case 'r':
+        if ( !rotateDone && config.transformAngles.indexOf( value ) >= 0 ) {
+          transformer.rotate( parseInt( value, 10 ) );
+          rotateDone = true;
+        }
+        break;
+      case 'm':
+        if ( !mirrorDone ) {
+          switch( value ) {
+            case 'flip':
+              transformer.flip();
+              mirrorDone = true;
+              break;
+            case 'flop':
+              transformer.flop();
+              mirrorDone = true;
+              break;
+          }
+        }
+        break;
+    }
+  } );
+
+  // when no operation that requires width and height were done, but either width and/or height
+  // is provided then default to resize scale
+  if ( !resizeDone && !extractDone && ( width || height ) ) {
+    transformer.resize( width, height );
+    if ( width && height ) {
+      transformer.ignoreAspectRatio();
+    }
+  }
+
+  if ( quality && quality > 0 && quality <= 100 ) {
+    transformer.quality( quality );
+  }
+
+  if ( format && config.transformFormats.indexOf( format ) >= 0 ) {
+    transformer.toFormat( format );
+  }
+
+  return transformer;
 };
 
 /*
@@ -52,13 +184,14 @@ var fourOhFour = function( res, msg, url ) {
  * @param     object    url                 url object
  * @param     object    mediaHeaders        http headers object
  * @param     object    res                 http response object
- * @param     integer   redirectsLeft       number of remaining redirects allowed
+ * @param     object    options             process options
  */
-var processUrl = function( url, mediaHeaders, res, redirectsLeft ) {
+var processUrl = function( url, mediaHeaders, res, options ) {
   var Protocol,
       queryPath,
       reqOptions,
-      srcReq;
+      srcReq,
+      redirectsLeft = options.redirect || 0;
 
   if ( url.host != null ) {
     if ( url.protocol === 'https:' ) {
@@ -94,14 +227,22 @@ var processUrl = function( url, mediaHeaders, res, redirectsLeft ) {
     }
 
     srcReq = Protocol.get( reqOptions, function( srcRes ) {
-      var isFinished,
+      var mediaRequested,
+          pendingTransform,
+          transformer,
           contentType,
           contentTypePrefix,
           contentLength,
           newHeaders,
-          newUrl;
+          newUrl,
+          redirectOptions;
 
-      isFinished = true;
+      // media is always requested at this point
+      mediaRequested = true;
+
+      pendingTransform = ( _.size( options.transform ) > 0 &&
+                           config.transformTypes.indexOf( srcRes.headers[ 'content-type' ] ) > 0 ) ? true : false;
+
 
       log.debug( srcRes.headers );
 
@@ -114,16 +255,38 @@ var processUrl = function( url, mediaHeaders, res, redirectsLeft ) {
       }
       else {
         srcRes.on( 'end', function() {
-          if ( isFinished ) {
+          if ( mediaRequested && !pendingTransform ) {
             return finish( res );
           }
         } );
 
         srcRes.on( 'error', function() {
-          if ( isFinished ) {
+          if ( mediaRequested ) {
             return finish( res );
           }
         } );
+
+        if ( pendingTransform ) {
+          try {
+            transformer = transformMedia( options.transform );
+
+            transformer.on( 'end', function() {
+              pendingTransform = false;
+              if ( mediaRequested ) {
+                return finish( res );
+              }
+            } );
+
+            transformer.on( 'error', function() {
+              pendingTransform = false;
+              srcRes.destroy();
+              return fiveHundred( res, 'Failed transforming media', url, options.transform );
+            } );
+          }
+          catch( e ) {
+            log.error( e, { 'req': reqOptions, 'transform': options.transform } );
+          }
+        }
 
         newHeaders = {
           'content-type': srcRes.headers[ 'content-type' ],
@@ -155,7 +318,8 @@ var processUrl = function( url, mediaHeaders, res, redirectsLeft ) {
           newHeaders[ 'Timing-Allow-Origin' ] = config.timingOrigin;
         }
 
-        if ( contentLength != null ) {
+        // don't set the content-length if a transformation pending
+        if ( !pendingTransform && contentLength != null ) {
           newHeaders[ 'content-length' ] = contentLength;
         }
 
@@ -190,7 +354,9 @@ var processUrl = function( url, mediaHeaders, res, redirectsLeft ) {
                 newUrl.protocol = url.protocol;
               }
               log.debug( 'Redirected to ' + ( newUrl.format() ) );
-              return processUrl( newUrl, mediaHeaders, res, redirectsLeft - 1 );
+              redirectOptions = _.clone( options );
+              redirectOptions.redirect = redirectsLeft - 1;
+              return processUrl( newUrl, mediaHeaders, res, redirectOptions );
             }
             break;
           // not modified (conditional requests)
@@ -213,8 +379,15 @@ var processUrl = function( url, mediaHeaders, res, redirectsLeft ) {
               return;
             }
             log.debug( newHeaders );
+
             res.writeHead( srcRes.statusCode, newHeaders );
-            return srcRes.pipe( res );
+
+            if ( transformer ) {
+              return srcRes.pipe( transformer ).pipe( res );
+            }
+            else {
+              return srcRes.pipe( res );
+            }
         }
       }
     } );
@@ -267,6 +440,30 @@ var decodeUrl = function( str ) {
 };
 
 /*
+ * parse string collecting media transformation options
+ * string should be the format key_value,key_value,key_value
+ *
+ * @param     string    str       string to parse
+ * @returns   object              transformation object
+ */
+var getTransformOptions = function( str ) {
+  var transform,
+      strList;
+
+  strList = str.split( ',' );
+  if ( strList.length > 0 ) {
+    strList.forEach( function( e ) {
+      var item = e.split( '_' );
+      if ( config.transformOptions.indexOf( item[ 0 ] ) >= 0 ) {
+        transform = transform || {};
+        transform[ item[ 0 ] ] = item[ 1 ];
+      }
+    } );
+  }
+  return transform;
+};
+
+/*
  * process a get request to an external media asset
  *
  * @param   object    req       http request object
@@ -275,6 +472,7 @@ var decodeUrl = function( str ) {
 module.exports.processRequest = function( req, res ) {
   var url,
       mediaHeaders,
+      mediaTransform,
       parts,
       signature,
       reqSignature,
@@ -299,19 +497,34 @@ module.exports.processRequest = function( req, res ) {
   // no need for cookies
   delete req.headers.cookie;
 
-  parts = url.pathname.replace( /^\//, '' ).split( '/', 2 );
+  parts = url.pathname.replace( /^\//, '' ).split( '/' );
   reqSignature = parts[ 0 ];
   encodedUrl = parts[ 1 ];
 
   destUrl = decodeUrl( encodedUrl );
 
+  var qs = QueryString.parse( url.query );
+
   // the code supports both path or querystring style requests
   if ( destUrl ) {
     urlType = 'path';
   }
-  else {
+  else if ( qs.url ) {
     urlType = 'query';
-    destUrl = QueryString.parse( url.query ).url;
+    destUrl = qs.url;
+  }
+  else {
+    return fourOhFour( res, 'missing required media url' );
+  }
+
+  // try to decode options through the url
+  if ( parts[ 2 ] ) {
+    mediaTransform = getTransformOptions( parts[ 2 ] );
+  }
+
+  // fallback to get media transformation through query string
+  if ( !mediaTransform ) {
+    mediaTransform = _.pick( qs, config.transformOptions );
   }
 
   log.debug( {
@@ -319,7 +532,8 @@ module.exports.processRequest = function( req, res ) {
     url: req.url,
     headers: req.headers,
     dest: destUrl,
-    reqSignature: reqSignature
+    reqSignature: reqSignature,
+    transform: mediaTransform
   } );
 
   // avoid looping requests
@@ -340,7 +554,7 @@ module.exports.processRequest = function( req, res ) {
     signature = hmac.digest( 'hex' );
     if ( signature === reqSignature ) {
       url = Url.parse( destUrl );
-      return processUrl( url, mediaHeaders, res, config.maxRedirects );
+      return processUrl( url, mediaHeaders, res, { 'redirects': config.maxRedirects, 'transform': mediaTransform } );
     }
     else {
       return fourOhFour( res, 'signature mismatch: ' + signature + ' | ' + reqSignature );

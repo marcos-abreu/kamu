@@ -1,6 +1,6 @@
 {
   "name": "kamu",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "SSL Asset Proxy",
   "main": "index.js",
   "scripts": {

@@ -92,10 +92,12 @@ var transformMedia = function( options ) {
       extractDone = false,
       transformer;
 
+  transformer = sharp();
+
   // images won't enlarge past its original size
   // todo: I don't know if this is desirable for all operations
   if ( config.transformWithoutEnlargement ) {
-    transformer = sharp().withoutEnlargement();
+    transformer.withoutEnlargement();
   }
 
   _.each( options, function( value, operation ) {

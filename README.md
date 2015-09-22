@@ -9,6 +9,7 @@ The code was originally based on the code provided by [github camo project](http
 **Kamu** was build to be easy to configure and extend, allowing you to adapt it to your own requirements. It also can be deployed into most of the hosting options available out there.
 
 ### Configuring Kamu
+___
 
 The most important configuration you will need to set are:
   - `KAMU_KEY`  - hexdec secure key
@@ -32,6 +33,7 @@ Bellow is a full list of environment variables you can set to configure the beha
 Aside from the environment variables you can define, you can also limit the `content-type` of assets you want to allow, for that use the [mime-types.json](mime-types.json) file available.
 
 ### Deploying Kamu
+___
 
 In order to properly deploy your **kamu** proxy server follow these steps:
 
@@ -40,6 +42,7 @@ In order to properly deploy your **kamu** proxy server follow these steps:
 * **Setp 3** - configure your server to start **Kamu** nodejs app and point your HTTP Server to it
 
 ### Serving Assets Through SSL
+___
 
 In order to serve your assets through a secure layer, the two most common options are:
 
@@ -53,6 +56,7 @@ If the process of managing your own SSL certificates, as well as configuring you
 Even if you go for *option #1* you should always consider using a CDN as a gateway to your **Kamu** proxy server in order to provide assets as fast as possible with low impact to the number of requests your server can handle. CDN's are always great options when serving assets.
 
 ### Generating Kamu Asset URL
+___
 
 Once you have configured your **kamu** proxy server, you will also need to generate HTML pages with links that makes use of your this server.
 
@@ -73,18 +77,17 @@ gulp proxy --url=http://www.some-domain.com/path/to/image.png [--key=SOME-HEXDEC
 the `--key` and `--host` are optinal parameters, and if not informed it will use the defaults provided in the [proxy/config.js](proxy/config.js) file. If your server set those enviroument variables (and they should) you must provide these options in order to generate valid urls.
 
 ### Processing Image
+___
 
 Kamu allows you to post process the image before sending it back to the original request. To do that you can either inform the operations through the url path or through querystring parameters:
 
 - when using the url path, inform it as the last part of the path, and with values separated from keys by an underscore sign, and properties separated from each other by commas. e.g:
-
-http://localhost:8081/12b1a82af6b7795101/687474703a2f2f616e696d616c69612d6c/x_crop,t_0,l_0,w_300,h_100
+`http://localhost:8081/f6b7795101/687474703a2f2f616e696d616c69612d6c/x_crop,t_0,l_0,w_300,h_100`
 
 on the previous example the first part of the url path is the public key, the second part is the encoded url, and the third part defines the properties to be applied to the image before returing it.
 
 - when using querystring parameters to inform the operations to be applied on the image, just follow the conventions for keys and values of querystring parameters. e.g:
-
-http://localhost:8081/12b1a82af6b7795101/687474703a2f2f616e696d616c69612d6c?x=crop&t=0&l=0&w=300&h=100
+`http://localhost:8081/f6b7795101/687474703a2f2f616e696d616c69612d6c?x=crop&t=0&l=0&w=300&h=100`
 
 Both examples above will generate the same output.
 
@@ -100,74 +103,80 @@ In order to manipulate the image you will need to inform the operation (or opera
 
 ##### Size Operations
 
-- **scale** (`s=scale` | `s_scale`) - (default operation) scale image exactly to the given width (`w`) and height (`h`) while NOT retaining proportions. When only one value of either width (`w`) or height (`h`) is provided, the image will resize to the provided size property while keeping a proportial ratio with the uninformed one.
+- **scale** (`s=scale` **|** `s_scale`) - (default operation) scale image exactly to the given width (`w`) and height (`h`) while NOT retaining proportions. When only one value of either width (`w`) or height (`h`) is provided, the image will resize to the provided size property while keeping a proportial ratio with the uninformed one.
 
-e.g: `//kamu-proxy.com/key/url?s=scale&w=200&h=100` | `//kamu-proxy.com/key/url/s_scale,w_200,h_100`
+   e.g: `/key/url?s=scale&w=200&h=100` **|** `/key/url/s_scale,w_200,h_100`
 
-- **fit** (`s=fit` | `s_fit`) - scale image to fit in the given width (`w`) and height (`h`) while retaining original proportions. If only one value of either width (`w`) or height (`h`) is provided, the operation will fallback to `scale`.
+- **fit** (`s=fit` **|** `s_fit`) - scale image to fit in the given width (`w`) and height (`h`) while retaining original proportions. If only one value of either width (`w`) or height (`h`) is provided, the operation will fallback to `scale`.
 
-e.g: `//kamu-proxy.com/key/url?s=fit&w=200&h=100` | `//kamu-proxy.com/key/url/s_fit,w_200,h_100`
+   e.g: `/key/url?s=fit&w=200&h=100` **|** `/key/url/s_fit,w_200,h_100`
 
-- **fill** (`s=fill` | `s_fill`) - preserving aspect ratio, resize image to be as small as possible while ensuring its dimentions are greater than or equal to the width and height specified. If only one value of either width (`w`) or height (`h`) is provided, the operation will fallback to `scale`.
+- **fill** (`s=fill` **|** `s_fill`) - preserving aspect ratio, resize image to be as small as possible while ensuring its dimentions are greater than or equal to the width and height specified. If only one value of either width (`w`) or height (`h`) is provided, the operation will fallback to `scale`.
 
-e.g: `//kamu-proxy.com/key/url?s=fill&w=200&h=100` | `//kamu-proxy.com/key/url/s_fill,w_200,h_100`
+   e.g: `/key/url?s=fill&w=200&h=100` **|** `/key/url/s_fill,w_200,h_100`
 
 ##### Extract Operations
 
-- **crop** (`s=crop` | `s_crop`) - extracts portion of the image defined by width (`xw`) and height (`xh`), with an optional offset: top (`xt`) and left (`xl`). If only one value of either width (`xw`) or height (`xh`) is provided, no operation will be performed.
+- **crop** (`s=crop` **|** `s_crop`) - extracts portion of the image defined by width (`xw`) and height (`xh`), with an optional offset: top (`xt`) and left (`xl`). If only one value of either width (`xw`) or height (`xh`) is provided, no operation will be performed.
 
-e.g:
-`//kamu-proxy.ca/key/url?x=crop&xw=200&xh=100` | `//kamu-proxy.ca/key/url/x_crop,xw_200,xh_100`
+   e.g:
 
-e.g: extracting with offset
-`//kamu-proxy.ca/key/url?x=crop&xw=200&xh=100&xt=50&xl=10` | `//kamu-proxy.ca/key/url/x_crop,xw_200,xh_100,xt_50,xl_10`
+   `/key/url?x=crop&xw=200&xh=100` **|** `/key/url/x_crop,xw_200,xh_100`
+
+   e.g: extracting with offset
+
+   `/key/url?x=crop&xw=200&xh=100&xt=50&xl=10` **|** `/key/url/x_crop,xw_200,xh_100,xt_50,xl_10`
 
 p.s: note that extract properties for width, height, top and left are prefixed with an `x`
 
 ##### Rotate Operations
 
-- **rotate** (`r=90` | `r_90`) - rotates the image clockwise by predefined angles of: 0, 90, 180, 270 degrees. If you inform any other angle, the operation won't be performed. 
+- **rotate** (`r=90` **|** `r_90`) - rotates the image clockwise by predefined angles of: 0, 90, 180, 270 degrees. If you inform any other angle, the operation won't be performed. 
 
-e.g: `//kamu-proxy.com/key/url?r=180` | `//kamu-proxy.com/key/url/r_180`
+   e.g: `/key/url?r=180` **|** `/key/url/r_180`
 
 ##### Mirroring Operations
 
-- **flip** (`m=flip` | `m_flip`) - flip the image vertically
+- **flip** (`m=flip` **|** `m_flip`) - flip the image vertically
 
-e.g: `//kamu-proxy.com/key/url?m=flip` | `//kamu-proxy.com/key/url/m_flip`
+   e.g: `/key/url?m=flip` **|** `/key/url/m_flip`
 
-- **flop** (`m=flop` | `m_flop`) -  flop the image horizontally
+- **flop** (`m=flop` **|** `m_flop`) -  flop the image horizontally
 
-e.g: `//kamu-proxy.com/key/url?m=flop` | `//kamu-proxy.com/key/url/m_flop`
+   e.g: `/key/url?m=flop` **|** `/key/url/m_flop`
 
 
 #### Combined Operations
 
 You can combine operations that don't bellong to the same group in order to active a more complex result, such as: rotate and crop; or scale and flip; or rotate, crop, and flop. Keep in mind that when applying combined operations the order which you inform the operations might impact the final result.
 
-e.g: rotate and crop
-`//kamu-proxy.ca/key/url?r=180&x=crop&w=200&h=100` | `//kamu-proxy.ca/key/url/r_180,x_crop,w_200,h_100`
+   e.g: rotate and crop
 
-e.g: scale and flip
-`//kamu-proxy.ca/key/url?s=scale&w=200&h=100&m=flip` | `//kamu-proxy.ca/key/url/s_scale,w_200,h_100,m_flip`
+   `/key/url?r=180&x=crop&w=200&h=100` **|** `/key/url/r_180,x_crop,w_200,h_100`
 
-e.g: rotate, crop and flip
-`//kamu-proxy.ca/key/url?r=90&x=crop&w=200&h=100&m=flip` | `//kamu-proxy.ca/key/url/r_90,x_crop,w_200,h_100,m_flip`
+   e.g: scale and flip
+
+   `/key/url?s=scale&w=200&h=100&m=flip` **|** `/key/url/s_scale,w_200,h_100,m_flip`
+
+   e.g: rotate, crop and flip
+
+   `/key/url?r=90&x=crop&w=200&h=100&m=flip` **|** `/key/url/r_90,x_crop,w_200,h_100,m_flip`
 
 #### Output
 
 In adition to the operations you can perform on the image, you can also control the output quality and encoding format for the result image.
 
-- **quality** (`q=80` | `q_80`) - Defineds the output quality for the image. the value can range from 1 to 100.
+- **quality** (`q=80` **|** `q_80`) - Defineds the output quality for the image. the value can range from 1 to 100.
 
-e.g: `//kamu-proxy.ca/key/url?r=180&q=60` | e.g: `//kamu-proxy.ca/key/url/r_180,q_60`
+   e.g: `/key/url?r=180&q=60` **|** e.g: `/key/url/r_180,q_60`
 
-- **format** (`f=png` | `f_png`) - Defines the output format for the image, valid values are: `jpeg`, `png`, `webp` and `raw`. Anything else or no format will default to the input format.
+- **format** (`f=png` **|** `f_png`) - Defines the output format for the image, valid values are: `jpeg`, `png`, `webp` and `raw`. Anything else or no format will default to the input format.
 
-e.g: `//kamu-proxy.ca/key/url?s=fit&w=200&h=100&f=png` | `//kamu-proxy.ca/key/url/s_fit,w_200,h_100,f_png`
+   e.g: `/key/url?s=fit&w=200&h=100&f=png` **|** `/key/url/s_fit,w_200,h_100,f_png`
 
 
 ### Contributing to Kamu
+___
 
 If you find yourself improving the code and you think others would benefit from your changes, or if you find a bug in **kamu** open a pull request.
 

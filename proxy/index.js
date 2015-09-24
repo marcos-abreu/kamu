@@ -6,7 +6,6 @@ var Crypto      = require( 'crypto' ),
     Https       = require( 'https' ),
     QueryString = require( 'querystring' ),
     Url         = require( 'url' ),
-    sharp       = require( 'sharp' ),
     _           = require( 'lodash' );
 
 // custom modules
@@ -23,6 +22,7 @@ var finish = function( res, str ) {
   connStatus.close();
   // todo: why verifying the connection before ending the response
   //       I couldn't find anything in the official docs
+  // log.debug( '>>> response end called from finish method' );
   return res.connection && res.end( str );
 };
 
@@ -77,6 +77,8 @@ var fiveHundred = function( res, msg, url, err ) {
  * @param     object    options             processing options
  */
 var transformMedia = function( options ) {
+  var sharp = require( 'sharp' );
+
   var width = options.w ? parseInt( options.w, 10 ) || null : null,
       height = options.h ? parseInt( options.h, 10 ) || null : null,
       xwidth = options.xw ? parseInt( options.xw, 10 ) || null : null,
@@ -208,6 +210,7 @@ var processUrl = function( url, mediaHeaders, res, options ) {
 
     queryPath = url.pathname;
 
+    // todo: verify if query is enough or 'search' should also be checked
     if ( url.query != null ) {
       queryPath += '?' + url.query;
     }
@@ -231,6 +234,7 @@ var processUrl = function( url, mediaHeaders, res, options ) {
     srcReq = Protocol.get( reqOptions, function( srcRes ) {
       var mediaRequested,
           pendingTransform,
+          transformerError = false,
           transformer,
           contentType,
           contentTypePrefix,
@@ -257,13 +261,17 @@ var processUrl = function( url, mediaHeaders, res, options ) {
       }
       else {
         srcRes.on( 'end', function() {
-          if ( mediaRequested && !pendingTransform ) {
+          // log.debug( '>>> srcRes end event triggered' );
+          if ( mediaRequested && ( !pendingTransform && !transformerError ) ) {
+            // log.debug( '>>> finishing the main res because of srcRes end event' );
             return finish( res );
           }
         } );
 
         srcRes.on( 'error', function() {
+          // log.debug( '>>> srcRes error event triggered' );
           if ( mediaRequested ) {
+            // log.debug( '>>> finishing the main res because of srcRes error event' );
             return finish( res );
           }
         } );
@@ -273,16 +281,45 @@ var processUrl = function( url, mediaHeaders, res, options ) {
             transformer = transformMedia( options.transform );
 
             transformer.on( 'end', function() {
+              // log.debug( '>>> transformer end event triggered' );
               pendingTransform = false;
-              if ( mediaRequested ) {
+              if ( mediaRequested && !transformerError ) {
+                // log.debug( '>>> finishing the main res because of transformer end event' );
                 return finish( res );
               }
             } );
 
             transformer.on( 'error', function() {
+              log.error( 'failed transforming image', { 'reqUrl': options.reqUrl, 'assetUrl': url.format() } );
+              // log.debug( '>>> transformer error event triggered' );
               pendingTransform = false;
+              transformerError = true;
+              // log.debug( '>>> destroying srcRes stream because of transformer error event' );
               srcRes.destroy();
-              return fiveHundred( res, 'Failed transforming media', url, options.transform );
+              if ( config.transformRedirectOnError ) {
+                var redirectUrl = Url.parse( options.reqUrl, true );
+
+                // remove any transform information from the url
+                redirectUrl.search = '';
+                for ( var i = 0, j = config.transformOptions.length; i < j; i++ ) {
+                  delete redirectUrl.query[ config.transformOptions[ i ] ];
+                }
+                var redirectPath = redirectUrl.pathname.split( '/' );
+                if ( redirectPath.length > 3 ) { // 3 === leading slash and two paramenters
+                  redirectPath.pop();
+                }
+                redirectUrl.pathname = redirectPath.join( '/' );
+
+                // redirect the request
+                res.writeHead( 302, {
+                  'Location': redirectUrl.format()
+                } );
+                return finish( res );
+              }
+              else {
+                // log.debug( '>>> returning a 500 because of transformer error event' );
+                return fiveHundred( res, 'Failed transforming media', url, options.transform );
+              }
             } );
           }
           catch( e ) {
@@ -395,20 +432,25 @@ var processUrl = function( url, mediaHeaders, res, options ) {
     } );
 
     srcReq.setTimeout( config.socketTimeout * 1000, function() {
+      // log.debug( '>>> srcReq socket timeout triggered - will abort srcReq' );
       srcReq.abort();
+      // log.debug( '>>> will return a 404' );
       return fourOhFour( res, 'Socket timeout', url );
     } );
 
     srcReq.on( 'error', function( err ) {
+      // log.debug( '>>> srcReq error event triggered - will return 404' );
       return fourOhFour( res, 'Client Request error ' + err.stack, url );
     } );
 
     res.on( 'close', function() {
+      // log.debug( '>>> res close event triggered - will abort the srcReq' );
       log.error( 'Request aborted' );
       return srcReq.abort();
     } );
 
     res.on( 'error', function( err ) {
+      // log.debug( '>>> res error event triggered - will abort the srcReq' );
       log.error( 'Request error: ' + err );
       return srcReq.abort();
     } );
@@ -555,8 +597,8 @@ module.exports.processRequest = function( req, res ) {
     }
     signature = hmac.digest( 'hex' );
     if ( signature === reqSignature ) {
-      url = Url.parse( destUrl );
-      return processUrl( url, mediaHeaders, res, { 'redirects': config.maxRedirects, 'transform': mediaTransform } );
+      // url = Url.parse( destUrl );
+      return processUrl( Url.parse( destUrl ), mediaHeaders, res, { 'redirects': config.maxRedirects, 'transform': mediaTransform, 'reqUrl': url.format() } );
     }
     else {
       return fourOhFour( res, 'signature mismatch: ' + signature + ' | ' + reqSignature );

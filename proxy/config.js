@@ -62,6 +62,10 @@ exports.transformGravity = [ 'north', 'east', 'south', 'west', 'center', 'centre
 // xw   crop w  |   xh    crop h    |  xt   crop top |  xl    crop left
 exports.transformOptions = [ 's', 'x', 'r', 'm', 'q', 'f', 'w', 'h', 'xw', 'xh', 'xt', 'xl', 'g' ];
 
+// by default it will redirec the request to the original url without the transformation parameters
+// in case the transformation fails
+exports.transformRedirectOnError = process.env.KAMU_TRANS_REDIRECT_ONERROR &&
+                                   process.env.KAMU_TRANS_REDIRECT_ONERROR.toLowercase() === 'false' ? false : true;
 
 // default safe headers to be used by default on responses
 exports.defaultHeaders  = {

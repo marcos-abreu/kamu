@@ -7,7 +7,7 @@ var path          = require( 'path' ),
     argv          = require( 'yargs' ).argv,
     runSequence   = require( 'run-sequence' ),
     proxyUrl      = require( './demo/utils' ).proxyUrl,
-    config        = require( './proxy/config' );
+    config        = require( './src/config' );
 
 gulp.task( 'test:unit', function() {
   return gulp.src( path.resolve( __dirname, 'test/specs/**/*.spec.js' ), { read: false } )

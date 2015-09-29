@@ -4,9 +4,9 @@
 var Http        = require( 'http' );
 
 // custom modules
-var config      = require( './proxy/config' ),
-    connStatus  = require( './proxy/connection-status' ),
-    proxy       = require( './proxy' );
+var config      = require( './src/config' ),
+    connStatus  = require( './src/connection' ),
+    app         = require( './src' );
 
 // start tracking connections
 connStatus.start();
@@ -30,7 +30,7 @@ var server = Http.createServer( function( req, res ) {
   // if the request passed the first set of filters than process the request
   else {
     connStatus.open();
-    return proxy.processRequest( req, res );
+    return app.processRequest( req, res );
   }
 } );
 

@@ -12,9 +12,8 @@ exports.version         = meta.version;
 exports.proxyKey        = process.env.KAMU_KEY || '0xF6D61696E2E636F6D2F736';
 
 
-// can be set to: 'debug', 'enabled', or 'disabled'
+// can be set to: 'disabled' (no logs), 'debug' (all logs), 'dev' (warns and errors), 'prod' (only errors)
 exports.log             = process.env.KAMU_LOGGING || 'disabled';
-
 
 // serer host
 exports.host            = process.env.KAMU_HOST || 'https://www.media-proxy.com';

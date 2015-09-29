@@ -2,8 +2,8 @@
  * The following generates a proxy url, based on the current server configuration
  * and the provided url parameter
  */
-var Crypto = require('crypto');
-var config = require( '../proxy/config' );
+var Crypto = require( 'crypto' );
+var config = require( '../src/config' );
 
 /*
  * returns a proxy url string based on server configuration

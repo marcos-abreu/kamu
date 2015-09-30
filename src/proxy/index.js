@@ -25,7 +25,7 @@ var processUrl = function( url, mediaHeaders, res, options ) {
   var Protocol,
       mediaReqOptions,
       mediaReq,
-      redirectsLeft = options.redirect || 0;
+      redirectsLeft = options.redirects || 0;
 
   if ( url.host != null ) {
     Protocol = url.protocol === 'https:' ? Https : url.protocol === 'http:' ? Http : null;
@@ -47,15 +47,16 @@ var processUrl = function( url, mediaHeaders, res, options ) {
       log.debug( 'media response headers', mediaRes.headers );
 
       // set the necessary flags
-      mediaRes.requested = true;
-      mediaRes.pendingTransform = ( _.size( options.transform ) > 0 &&
+      res._media = res._media || {};
+      res._media.finished = true;
+      res._media.pendingTransform = ( _.size( options.transform ) > 0 &&
                                   config.transformTypes.indexOf( mediaRes.headers[ 'content-type' ] ) > 0 ) ? true : false;
-      mediaRes.transformError = false;
+      res._media.transformError = false;
 
       log.debug( 'media response flags', {
-        requested: mediaRes.requested,
-        pendingTransform: mediaRes.pendingTransform,
-        transformError: mediaRes.transformError
+        requested: res._media.finished,
+        pendingTransform: res._media.pendingTransform,
+        transformError: res._media.transformError
       } );
 
       // test content length limit
@@ -66,18 +67,18 @@ var processUrl = function( url, mediaHeaders, res, options ) {
       }
       else {
         mediaRes.on( 'end', function() {
-          if ( mediaRes.requested && ( !mediaRes.pendingTransform && !mediaRes.transformError ) ) {
+          if ( res._media.finished && ( !res._media.pendingTransform && !res._media.transformError ) ) {
             return utils.finish( res );
           }
         } );
 
         mediaRes.on( 'error', function() {
-          if ( mediaRes.requested ) {
+          if ( res._media.finished ) {
             return utils.finish( res );
           }
         } );
 
-        if ( mediaRes.pendingTransform ) {
+        if ( res._media.pendingTransform ) {
           transformer = transform.getTransformer( res, mediaRes, options.transform, options.reqUrl, url.format() );
         }
 
@@ -112,7 +113,7 @@ var processUrl = function( url, mediaHeaders, res, options ) {
         }
 
         // don't set the content-length if a transformation pending
-        if ( !mediaRes.pendingTransform && contentLength != null ) {
+        if ( !res._media.pendingTransform && contentLength != null ) {
           newHeaders[ 'content-length' ] = contentLength;
         }
 
@@ -139,7 +140,7 @@ var processUrl = function( url, mediaHeaders, res, options ) {
               return utils.fourOhFour( res, 'Redirect with no location', url );
             }
             else {
-              isFinished = false;
+              res._media.finished = false;
 
               newUrl = Url.parse( mediaRes.headers[ 'location' ] );
               if ( !( ( newUrl.host != null ) && ( newUrl.hostname != null ) ) ) {
@@ -148,7 +149,7 @@ var processUrl = function( url, mediaHeaders, res, options ) {
               }
               log.debug( 'Redirected to ' + ( newUrl.format() ) );
               redirectOptions = _.clone( options );
-              redirectOptions.redirect = redirectsLeft - 1;
+              redirectOptions.redirects = redirectsLeft - 1;
               return processUrl( newUrl, mediaHeaders, res, redirectOptions );
             }
             break;

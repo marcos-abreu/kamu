@@ -17,7 +17,7 @@ module.exports.debug = function( msg, obj ) {
     }
 
     if ( msg && !obj ) {
-      msg = obj;
+      obj = msg;
       msg = null;
     }
 

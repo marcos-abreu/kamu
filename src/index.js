@@ -56,7 +56,7 @@ module.exports.processRequest = function( req, res ) {
   if ( destUrl ) {
     urlType = 'path';
   }
-  else if ( qs.url ) {
+  else if ( qs && qs.url ) {
     urlType = 'query';
     destUrl = qs.url;
   }

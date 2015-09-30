@@ -178,8 +178,8 @@ var getTransformer = function( res, mediaRes, options, reqUrl, mediaUrl ) {
     transformer = transformMedia( options );
 
     transformer.on( 'end', function() {
-      mediaRes.pendingTransform = false;
-      if ( mediaRes.requested && !mediaRes.transformError ) {
+      res._media.pendingTransform = false;
+      if ( res._media.finished && !res._media.transformError ) {
         return utils.finish( res );
       }
     } );
@@ -188,8 +188,8 @@ var getTransformer = function( res, mediaRes, options, reqUrl, mediaUrl ) {
       var errorObj = _.clone( infoObj );
       errorObj.err = err;
 
-      mediaRes.pendingTransform = false;
-      mediaRes.transformError = true;
+      res._media.pendingTransform = false;
+      res._media.transformError = true;
 
       mediaRes.destroy();
 

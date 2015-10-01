@@ -23,7 +23,7 @@ var parseUrl = function( str ) {
   if ( strList.length > 0 ) {
     strList.forEach( function( e ) {
       var item = e.split( '_' );
-      if ( config.transformOptions.indexOf( item[ 0 ] ) >= 0 ) {
+      if ( item.length > 1 && config.transformOptions.indexOf( item[ 0 ] ) >= 0 ) {
         transform = transform || {};
         transform[ item[ 0 ] ] = item[ 1 ];
       }
@@ -51,7 +51,9 @@ module.exports.parseQS = parseQS;
  * @param     object    options             processing options
  */
 var transformMedia = function( options ) {
-  var sharp = require( 'sharp' );
+  // INFO: options.__sharpLib is just a way of making this soft dependency module
+  //       testable it should not be specified by any call to transformMedia
+  var sharp = options.__sharpLib || require( 'sharp' );
 
   var width = options.w ? parseInt( options.w, 10 ) || null : null,
       height = options.h ? parseInt( options.h, 10 ) || null : null,
@@ -217,7 +219,7 @@ var getTransformer = function( res, mediaRes, options, reqUrl, mediaUrl ) {
         return utils.finish( res );
       }
       else {
-        return utils.fiveHundred( res, 'Failed transforming media', url, errorObj );
+        return utils.fiveHundred( res, 'Failed transforming media', Url.parse( mediaUrl ), errorObj );
       }
     } );
   }

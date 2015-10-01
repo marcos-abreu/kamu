@@ -5,7 +5,6 @@
 // custom modules
 var log         = require( './log' );
 
-
 /*
  * decodes a url from hexdec to string
  *

@@ -58,9 +58,10 @@ module.exports.processRequest = function( req, res ) {
   }
   else if ( qs && qs.url ) {
     urlType = 'query';
-    destUrl = qs.url;
+    destUrl = schema.decodeUrl( qs.url );
   }
-  else {
+
+  if ( !destUrl ) {
     return utils.fourOhFour( res, 'missing required media url' );
   }
 
@@ -89,7 +90,7 @@ module.exports.processRequest = function( req, res ) {
   }
 
   // checking url.pathname since signature is mandatory as pathname
-  if ( ( url.pathname != null ) && destUrl ) {
+  if ( reqSignature ) {
     hmac = Crypto.createHmac( 'sha1', config.proxyKey );
     try {
       hmac.update( destUrl, 'utf8' );
@@ -107,6 +108,6 @@ module.exports.processRequest = function( req, res ) {
     }
   }
   else {
-    return utils.fourOhFour( res, 'No pathname provided on the server' );
+    return utils.fourOhFour( res, 'No signature provided' );
   }
 };

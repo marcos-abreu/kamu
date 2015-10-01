@@ -1,12 +1,7 @@
 'use strict';
 
 // built-in/third-party modules
-var Crypto      = require( 'crypto' ),
-    Http        = require( 'http' ),
-    Https       = require( 'https' ),
-    QueryString = require( 'querystring' ),
-    Url         = require( 'url' ),
-    _           = require( 'lodash' );
+var QueryString = require( 'querystring' );
 
 // custom modules
 var config      = require( '../config' ),

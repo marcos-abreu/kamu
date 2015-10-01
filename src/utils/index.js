@@ -63,7 +63,10 @@ module.exports.fiveHundred = fiveHundred;
  */
 var finish = function( res, str ) {
   connStatus.close();
-  return ( res.connection && res.end( str ) ) || ( !res.finished && res.end( str ) );
+
+  if ( res.connection || !res.finished ) {
+    return res.end( str );
+  }
 };
 module.exports.finish = finish;
 

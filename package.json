@@ -4,7 +4,7 @@
   "description": "SSL Asset Proxy",
   "main": "index.js",
   "scripts": {
-    "test": "gulp test:unit",
+    "test": "gulp test",
     "start": "node index.js"
   },
   "repository": {

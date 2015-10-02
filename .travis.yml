@@ -1,15 +1,13 @@
 language: node_js
 node_js:
-  - "0.10"
   - "0.12"
-  - "4.0"
-  - "4.1"
-  - "stable"
 
 before_install:
-  - sudo apt-get install pkg-config automake build-essential curl gobject-introspection gtk-doc gtk-doc-tools fontconfig gettext swig libglib2.0-dev libjpeg-turbo8-dev libpng12-dev libwebp-dev libtiff5-dev libexif-dev libxml2-dev libfftw3-dev libmagickwand-dev libmagickcore-dev libgsf-1-dev liblcms2-dev liborc-0.4-dev little-cms2 libpango1.0-dev graphicsmagick
+  - sudo apt-get update
+  - sudo apt-get install pkg-config automake build-essential curl gobject-introspection gtk-doc-tools fontconfig gettext swig libglib2.0-dev libjpeg-turbo8-dev libpng12-dev libwebp-dev libtiff4 libexif-dev libxml2-dev libfftw3-dev libmagickwand-dev libmagickcore-dev libgsf-1-dev liblcms2-dev liborc-0.4-dev libpango1.0-dev graphicsmagick
 
   - curl -s https://raw.githubusercontent.com/lovell/sharp/master/preinstall.sh | sudo bash -s -- --with-openslide
 
 before_script:
   - npm install -g gulp
+

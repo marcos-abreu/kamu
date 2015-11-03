@@ -240,9 +240,10 @@ describe( 'app integration ->', function() {
         reqOptions.path = bkpPath;
       } );
 
-      it( 'should return a 404', function( done ) {
+      it( 'should return a placeholder image', function( done ) {
         req = http.request( reqOptions, function( res ) {
-          expect( res.statusCode ).to.be.equal( 404 );
+          expect( res.statusCode ).to.be.equal( 200 );
+          expect( res.headers['content-type'] ).to.be.equal( 'image/jpeg' );
           done();
         } );
         req.end(); // necessary when using http.request
@@ -273,9 +274,10 @@ describe( 'app integration ->', function() {
           reqOptions.path = bkpValidPath;
         } );
 
-        it( 'should return a 404', function( done ) {
+        it( 'should return a placeholder image', function( done ) {
           req = http.request( reqOptions, function( res ) {
-            expect( res.statusCode ).to.be.equal( 404 );
+            expect( res.statusCode ).to.be.equal( 200 );
+            expect( res.headers['content-type'] ).to.be.equal( 'image/jpeg' );
             done();
           } );
           req.end(); // necessary when using http.request
@@ -297,9 +299,10 @@ describe( 'app integration ->', function() {
         } );
 
 
-        it( 'should return a 404', function( done ) {
+        it( 'should return a placeholder image', function( done ) {
           req = http.request( reqOptions, function( res ) {
-            expect( res.statusCode ).to.be.equal( 404 );
+            expect( res.statusCode ).to.be.equal( 200 );
+            expect( res.headers['content-type'] ).to.be.equal( 'image/jpeg' );
             done();
           } );
           req.end(); // necessary when using http.request
@@ -319,10 +322,11 @@ describe( 'app integration ->', function() {
             reqOptions.path = bkpPath;
           } );
 
-          it( 'should return a 404', function( done ) {
+          it( 'should return a placeholder image', function( done ) {
             this.timeout( 10000 );
             req = http.request( reqOptions, function( res ) {
-              expect( res.statusCode ).to.be.equal( 404 );
+              expect( res.statusCode ).to.be.equal( 200 );
+              expect( res.headers['content-type'] ).to.be.equal( 'image/jpeg' );
               done();
             } );
             req.end(); // necessary when using http.request
@@ -344,10 +348,11 @@ describe( 'app integration ->', function() {
               reqOptions.path = bkpPath;
             } );
 
-            it( 'should return a 404 response', function( done ) {
+            it( 'should return a placeholder image', function( done ) {
               this.timeout( 10000 );
               req = http.request( reqOptions, function( res ) {
-                expect( res.statusCode ).to.be.equal( 404 );
+                expect( res.statusCode ).to.be.equal( 200 );
+                expect( res.headers['content-type'] ).to.be.equal( 'image/jpeg' );
                 done();
               } );
               req.end(); // necessary when using http.request
@@ -495,10 +500,11 @@ describe( 'app integration ->', function() {
         reqOptions.path = bkpPath;
       } );
 
-      it( 'should return a not found response', function( done ) {
+      it( 'should return a placeholder image', function( done ) {
         this.timeout( 10000 );
         req = http.request( reqOptions, function( res ) {
-          expect( res.statusCode ).to.be.equal( 404 );
+          expect( res.statusCode ).to.be.equal( 200 );
+          expect( res.headers['content-type'] ).to.be.equal( 'image/jpeg' );
           done();
         } );
         req.end(); // necessary when using http.request

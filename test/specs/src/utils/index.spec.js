@@ -78,11 +78,12 @@ describe( 'utils index', function() {
       expect( utils.__get__( 'log' ).warn ).to.have.been.calledOnce;
     } );
 
-    it( 'should write a 404 response', function() {
+    it( 'should write a placeholder image', function() {
       utils.__get__( 'writeErrorHead' ).reset();
       utils.fourOhFour( res, msg, url );
       expect( utils.__get__( 'writeErrorHead' ) ).to.have.been.calledOnce;
-      expect( utils.__get__( 'writeErrorHead' ).getCall( 0 ).args [1 ] ).to.be.equal( 404 );
+      expect( utils.__get__( 'writeErrorHead' ).getCall( 0 ).args [1 ] ).to.be.equal( 200 );
+      expect( utils.__get__( 'writeErrorHead' ).getCall( 0 ).args [2 ] ).to.be.equal( 'image/jpeg' );
     } );
 
     it( 'should finish the response', function() {

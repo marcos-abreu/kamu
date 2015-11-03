@@ -68,6 +68,7 @@ exports.transformRedirectOnError = process.env.KAMU_TRANS_REDIRECT_ONERROR ? pro
 
 // default safe headers to be used by default on responses
 exports.defaultHeaders  = {
+  "Content-Type": "text",
   // do not allow part images to be shown on frames (iframes)
   "X-Frame-Options": "deny",
   // enables cross-site scripting filter (built into most recent web browsers)

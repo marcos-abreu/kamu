@@ -2,6 +2,7 @@
 
 // built-in/third-party modules
 var QueryString = require( 'querystring' ),
+            fs  = require('fs'),
     _           = require( 'lodash' );
 
 // custom modules
@@ -15,8 +16,9 @@ var config      = require( '../config' ),
  * @param     res           object        response object
  * @param     statusCode    integer       numeric response code to write
  */
-var writeErrorHead = function( res, statusCode ) {
+var writeErrorHead = function( res, statusCode, contentType ) {
   res.writeHead( statusCode, {
+    'Content-Type': contentType || config.defaultHeaders[ 'Content-Type' ],
     'expires': '0',
     'Cache-Control': 'no-cache, no-store, private, must-revalidate',
     'X-Frame-Options': config.defaultHeaders[ 'X-Frame-Options' ],
@@ -28,7 +30,7 @@ var writeErrorHead = function( res, statusCode ) {
 };
 
 /*
- * respond with a 404 response
+ * for backwards compatibility with legacy clients, respond with a placeholder image instead of a normal 404 response
  *
  * @param   object    res     http response object
  * @param   string    msg     404 message string
@@ -36,8 +38,15 @@ var writeErrorHead = function( res, statusCode ) {
  */
 var fourOhFour = function( res, msg, url ) {
   log.warn( msg + ': ' + ( ( url != null ? url.format() : void 0 ) || 'unknown' ) );
-  writeErrorHead( res, 404 );
-  return finish( res, 'Not Found' );
+
+  try {
+    var data = fs.readFileSync('./placeholders/404.jpg');
+    writeErrorHead( res, 200, 'image/jpeg' );
+    return finish( res, data );
+  } catch (e) {
+    writeErrorHead( res, 200 );
+    return finish( res, 'Not Found' );
+  }
 };
 module.exports.fourOhFour = fourOhFour;
 

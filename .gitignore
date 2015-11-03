@@ -1,1 +1,3 @@
 node_modules/sharp/**
+.Dockerfile.swp
+npm-debug.log

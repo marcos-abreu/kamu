@@ -50,7 +50,7 @@ var processUrl = function( url, mediaHeaders, res, options ) {
       res._media = res._media || {};
       res._media.finished = true;
       res._media.pendingTransform = ( _.size( options.transform ) > 0 &&
-                                  config.transformTypes.indexOf( mediaRes.headers[ 'content-type' ] ) > 0 ) ? true : false;
+                                      config.transformTypes.indexOf( mediaRes.headers[ 'content-type' ].split( ';' )[ 0 ].toLowerCase() ) >= 0 )
       res._media.transformError = false;
 
       log.debug( 'media response flags', {
@@ -93,7 +93,7 @@ var processUrl = function( url, mediaHeaders, res, options ) {
         };
         newHeaders[ 'X-' +
                     config.name.charAt( 0 ).toUpperCase() +
-                    config.name.slice( 1 ).toLowerCase() + 
+                    config.name.slice( 1 ).toLowerCase() +
                     '-Host' ] = config.host;
 
         if ( mediaRes.headers[ 'etag' ] ) {
